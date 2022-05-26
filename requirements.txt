@@ -1,0 +1,9 @@
+pytest-bdd
+pytest
+boto3
+pandas
+botocore
+pyspark
+awscli
+awswrangler
+allure-pytest

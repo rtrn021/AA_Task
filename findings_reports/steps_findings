@@ -1,0 +1,32 @@
+Report of Tests (These are manually prepared as tests fail in early steps before checking any other steps)
+
+  Scenario: Scrape Appearences Test
+    Given Initiliase the details for table              >
+    When Read source data for scrape_appearances        >   Data exist
+    Then Validate the schema                            >   Schema matches
+    Then Validate pk check                              >   1 pair of duplication exist based on PKs
+    Then Validate null check                            >   3 Null values columns: (2 data, 1 scrape_count)
+    Then device column has only supported values        >   unexpected 2 values ('tablet') exist in 'device' column
+    Then search_term column max char long <= 400        >   matches
+    Then scrape_count column values > 0                 >   2 outliers exist, values: (0 and -1)
+    Then date column date format is valid               >   matches (except null values)
+
+
+  Scenario: Competitor Appearences Test
+    Given Initiliase the details for table              >
+    When Read source data for competitor_appearances    >   Data exist
+    Then Validate the schema                            >   Schema matches
+    Then Validate pk check                              >   No duplication
+    Then Validate null check                            >   1 Null value (domain column)
+    Then device column has only supported values        >   Matches
+    Then search_term column max char long <= 400        >   Matches
+    Then date column date format is valid               >   Matches
+    Then domain column max char long <= 100             >   Matches
+    Then sponsored_appearances column min value >= 0    >   Matches
+    Then natural_appearances column min value >= 0      >   Matches
+    Then pla_appearances column min value >= 0          >   Matches
+    Then ctr column min value >= 0                      >   1 outlier value: (-0.1)
+    Then ctr column max value <= 1.0                    >   1 outlier value: (1.01)
+    Then Each row has a corresponding row in scrape_appearances dataset                 >   1 no corresponding column found! search_term='no entry in scrape appearances', device='desktop, date='2022-05-13'
+    Then sponsored_appearances column max value =< scrape_count of scrape_appearances   >   306589 unexpected values for max value of sponsored_appearances
+
