@@ -1,9 +1,14 @@
 import pandas as pd
 from pyspark.sql import SparkSession
 from datetime import datetime
+import boto3
 import warnings
 
 warnings.filterwarnings("ignore")
+session = boto3.Session()
+credentials = session.get_credentials()
+access_key = credentials.access_key
+secret_key = credentials.secret_key
 
 
 def get_spark():
@@ -16,8 +21,8 @@ def get_spark():
             .builder
             .master("local[*]")
             .config('spark.jars.packages', 'org.apache.hadoop:hadoop-aws:3.2.2')
-            .config("fs.s3a.access.key", "AKIAWV4HZOSXKXDHGYNZ")
-            .config("fs.s3a.secret.key", "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")
+            .config("fs.s3a.access.key", access_key)
+            .config("fs.s3a.secret.key", secret_key)
             .config('spark.hadoop.fs.s3a.aws.credentials.provider',
                     'org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider')
             .config("fs.s3a.endpoint.key", "s3.amazonaws.com")
@@ -90,6 +95,7 @@ def validate_not_null_columns(spark, df, not_null_column_list):
     sum_null_values = sum(result.collect()[0])
     assert sum_null_values == 0, f'{sum_null_values} null values found!!!'
 
+
 def validate_column_has_supported_values(df, column, supported_values):
     """
     Checks if column only has supported values
@@ -101,6 +107,7 @@ def validate_column_has_supported_values(df, column, supported_values):
     column_values_list = df.select(column).filter(f'{column} is not Null').distinct().rdd.map(lambda r: r[0]).collect()
     unexpected_values_list = list(set(column_values_list) - set(supported_values))
     assert len(unexpected_values_list) == 0, f'{column} has unexpected values: {unexpected_values_list}!!!'
+
 
 def validate_max_length_of_column(df, column, max_length):
     """
